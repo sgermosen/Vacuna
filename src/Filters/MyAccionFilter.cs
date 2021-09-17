@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace VacunaAPI.Filters
 {
@@ -15,17 +11,14 @@ namespace VacunaAPI.Filters
         {
             this.logger = logger;
         }
-        //este es el primero aunque visualmente suele venir despues
+        //this is the first, but visualy it use to come later
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            logger.LogInformation("Before execute an acction");
+            // logger.LogInformation("Before execute an acction");
         }
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            logger.LogInformation("after execute an acction");
-
+            // logger.LogInformation("after execute an acction"); 
         }
-
-
     }
 }

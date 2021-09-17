@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using System;
 using System.Collections.Generic;
 
 namespace VacunaAPI.Filters
@@ -48,7 +47,6 @@ namespace VacunaAPI.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-          //  throw new NotImplementedException();
         }
     }
 }
