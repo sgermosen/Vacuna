@@ -9,7 +9,7 @@ namespace VacunaAPI.Utils
     {
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            var propertyName =bindingContext.ModelName;
+            var propertyName = bindingContext.ModelName;
             var value = bindingContext.ValueProvider.GetValue(propertyName);
             if (value == ValueProviderResult.None)
                 return Task.CompletedTask;

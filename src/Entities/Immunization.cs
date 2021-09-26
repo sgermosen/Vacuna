@@ -6,7 +6,7 @@ namespace VacunaAPI.Entities
     public class Immunization
     {
         public int Id { get; set; }
-         
+
         [Required]
         [StringLength(300)]
         public string VacunationCenter { get; set; }

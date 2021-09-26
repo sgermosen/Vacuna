@@ -14,11 +14,11 @@ using VacunaAPI.Utils;
 namespace VacunaAPI.Controllers
 {
     [Route("api/immunization")]
-    [ApiController] 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] 
+    [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ImmunizationsController : PsBaseController
     {
-           private readonly string container = "ImmunizationCards";
+        private readonly string container = "ImmunizationCards";
 
         public ImmunizationsController(UserManager<ApplicationUser> userManager, IMapper mapper, IStorageSaver storageSaver, ApplicationDbContext context) : base(userManager, mapper, storageSaver, context)
         {
@@ -40,7 +40,7 @@ namespace VacunaAPI.Controllers
         public async Task<ActionResult<List<ImmunizationDTO>>> Get()
         {
             var user = await GetConectedUser();
-            var inmunizations = await Context.Inmunizations.Where(p=>p.UserId == user.Id).ToListAsync();
+            var inmunizations = await Context.Immunizations.Where(p => p.UserId == user.Id).ToListAsync();
             return Mapper.Map<List<ImmunizationDTO>>(inmunizations);
         }
 
@@ -48,19 +48,26 @@ namespace VacunaAPI.Controllers
         public async Task<ActionResult> Post([FromBody] ImmunizationCreationDTO model)
         {
             var user = await GetConectedUser();
-            
+
             var inmunization = Mapper.Map<Immunization>(model);
             if (model.Photo != null)
                 inmunization.CardPicture = await StorageSaver.SaveFile(container, model.Photo);
             inmunization.UserId = user.Id;
 
             //TODO: Here we have to make validation of the center if exist or something
-           
+
             Context.Add(inmunization);
             await Context.SaveChangesAsync();
 
             return NoContent();
         }
-         
+
+        private async Task<IdentityUser> GetConectedUser()
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "email").Value;
+            var user = await UserManager.FindByEmailAsync(email);
+            return user;
+        }
+
     }
 }

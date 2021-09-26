@@ -8,7 +8,7 @@ namespace VacunaAPI.DTOs
         [Required]
         [StringLength(300)]
         public string VacunationCenter { get; set; }
-         
+
         public int LaboratoryId { get; set; }
         public string LaboratoryName { get; set; }
 

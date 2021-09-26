@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VacunaAPI;
 
 namespace VacunaAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210926233143_IndividualVaccineAndLabs")]
+    partial class IndividualVaccineAndLabs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -292,7 +294,7 @@ namespace VacunaAPI.Migrations
 
                     b.HasIndex("VaccineId");
 
-                    b.ToTable("Immunizations");
+                    b.ToTable("Inmunizations");
                 });
 
             modelBuilder.Entity("VacunaAPI.Entities.Laboratory", b =>

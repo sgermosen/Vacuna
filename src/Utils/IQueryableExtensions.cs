@@ -1,5 +1,5 @@
-﻿using VacunaAPI.DTOs;
-using System.Linq;
+﻿using System.Linq;
+using VacunaAPI.DTOs;
 
 namespace VacunaAPI.Utils
 {

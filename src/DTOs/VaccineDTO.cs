@@ -4,6 +4,6 @@
     {
         public int VaccineId { get; set; }
 
-        public string VaccineName { get; set; } 
+        public string VaccineName { get; set; }
     }
 }
