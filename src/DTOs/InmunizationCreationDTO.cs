@@ -6,17 +6,13 @@ namespace VacunaAPI.DTOs
 {
     public class InmunizationCreationDTO
     {
-        [Required]
-        [StringLength(50)]
-        public string Name { get; set; }
-
+         
         [Required]
         [StringLength(300)]
         public string VacunationCenter { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string Laboratory { get; set; }
+        public int LaboratoryId { get; set; }  
+        public int VaccineId { get; set; }
 
         [Required]
         [StringLength(50)]

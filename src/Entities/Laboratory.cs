@@ -1,10 +1,9 @@
-﻿using System;
-namespace VacunaAPI.Entities
+﻿namespace VacunaAPI.Entities
 {
     public class Laboratory
     {
-        public Laboratory()
-        {
-        }
+        public int Id { get; set; }
+
+        public string Name { get; set; }
     }
 }
