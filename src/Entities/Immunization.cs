@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VacunaAPI.Entities
 {
-    public class Inmunization
+    public class Immunization
     {
         public int Id { get; set; }
          
@@ -22,7 +22,7 @@ namespace VacunaAPI.Entities
         public string Lote { get; set; }
 
         [StringLength(300)]
-        public string Inmunizator { get; set; }
+        public string Immunizator { get; set; }
 
         public DateTime Date { get; set; }
         public string Barcode { get; set; }

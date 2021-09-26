@@ -23,9 +23,9 @@ namespace VacunaAPI.Entities
 
         public bool IsFromMinistry { get; set; }
         public int? VacunationCenterId { get; set; }
-        public VacunationCenter vacunationCenter { get; set; }
+        public VacunationCenter VacunationCenter { get; set; }//Only is filled for user than are created from ministry
 
-        public ICollection<Inmunization> Inmunizations { get; set; }
+        public ICollection<Immunization> Immunizations { get; set; }
 
     }
 }

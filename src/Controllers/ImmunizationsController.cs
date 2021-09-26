@@ -13,20 +13,20 @@ using VacunaAPI.Utils;
 
 namespace VacunaAPI.Controllers
 {
-    [Route("api/inmunization")]
+    [Route("api/immunization")]
     [ApiController] 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] 
-    public class InmunizationsController : PsBaseController
+    public class ImmunizationsController : PsBaseController
     {
-           private readonly string container = "InmunizationCards";
+           private readonly string container = "ImmunizationCards";
 
-        public InmunizationsController(UserManager<ApplicationUser> userManager, IMapper mapper, IStorageSaver storageSaver, ApplicationDbContext context) : base(userManager, mapper, storageSaver, context)
+        public ImmunizationsController(UserManager<ApplicationUser> userManager, IMapper mapper, IStorageSaver storageSaver, ApplicationDbContext context) : base(userManager, mapper, storageSaver, context)
         {
         }
 
 
-        //[HttpPost("validateInmunization")]
-        //public async Task<ActionResult<InmunizationDTO>> ValidateInmunization()
+        //[HttpPost("validateImmunization")]
+        //public async Task<ActionResult<ImmunizationDTO>> ValidateImmunization()
         //{
         //    var user = await GetConectedUser();
         //    //TODO: Validate if have the subscription or rol to make this action
@@ -37,19 +37,19 @@ namespace VacunaAPI.Controllers
         //}
 
         [HttpGet]
-        public async Task<ActionResult<List<InmunizationDTO>>> Get()
+        public async Task<ActionResult<List<ImmunizationDTO>>> Get()
         {
             var user = await GetConectedUser();
             var inmunizations = await Context.Inmunizations.Where(p=>p.UserId == user.Id).ToListAsync();
-            return Mapper.Map<List<InmunizationDTO>>(inmunizations);
+            return Mapper.Map<List<ImmunizationDTO>>(inmunizations);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] InmunizationCreationDTO model)
+        public async Task<ActionResult> Post([FromBody] ImmunizationCreationDTO model)
         {
             var user = await GetConectedUser();
             
-            var inmunization = Mapper.Map<Inmunization>(model);
+            var inmunization = Mapper.Map<Immunization>(model);
             if (model.Photo != null)
                 inmunization.CardPicture = await StorageSaver.SaveFile(container, model.Photo);
             inmunization.UserId = user.Id;

@@ -10,9 +10,9 @@ namespace VacunaAPI.Utils
     {
         public AutoMapperProfiles(GeometryFactory geometryFactory)
         {
-            CreateMap<Inmunization, InmunizationDTO>().ReverseMap();
+            CreateMap<Immunization, ImmunizationDTO>().ReverseMap();
 
-            CreateMap<InmunizationCreationDTO, Inmunization>()
+            CreateMap<ImmunizationCreationDTO, Immunization>()
                 .ForMember(x => x.CardPicture,
                                 options => options.Ignore());//  we ignore one or various properties than we want to treat as a diferent way  
 

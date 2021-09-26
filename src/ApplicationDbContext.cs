@@ -24,7 +24,7 @@ namespace VacunaAPI
             base.OnModelCreating(modelBuilder);
         }
          
-        public DbSet<Inmunization> Inmunizations { get; set; }
+        public DbSet<Immunization> Inmunizations { get; set; }
         public DbSet<VacunationCenter> VacunationCenters { get; set; }
         public DbSet<Laboratory> Laboratories { get; set; }
         public DbSet<Vaccine> Vaccines { get; set; }

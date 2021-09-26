@@ -1,7 +1,7 @@
 ﻿
 namespace VacunaAPI.DTOs
 {
-    public class InmunizationValidDTO
+    public class ImmunizationValidDTO
     {
         public string Identification { get; set; }
 
