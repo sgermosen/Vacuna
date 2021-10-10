@@ -130,6 +130,7 @@ namespace VacunaAPI.Controllers
 
             return new AuthenticationResponse()
             {
+                UserId = user.Id,
                 Expiration = expiration,
                 Token = new JwtSecurityTokenHandler().WriteToken(token)
             };
