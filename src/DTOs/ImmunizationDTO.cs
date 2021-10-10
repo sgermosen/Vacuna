@@ -5,6 +5,8 @@ namespace VacunaAPI.DTOs
 {
     public class ImmunizationDTO
     {
+        public int Id { get; set; }
+
         [Required]
         [StringLength(300)]
         public string VacunationCenter { get; set; }

@@ -40,7 +40,6 @@ namespace VacunaAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] LaboratoryDTO model)
         {
-            // var user = await GetConectedUser(); 
             var laboratory = new Laboratory { Name = model.LaboratoryName };
             Context.Add(laboratory);
             await Context.SaveChangesAsync();

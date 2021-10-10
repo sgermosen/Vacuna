@@ -40,7 +40,6 @@ namespace VacunaAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] VaccineDTO model)
         {
-            // var user = await GetConectedUser(); 
             var vaccine = new Vaccine { Name = model.VaccineName };
             Context.Add(vaccine);
             await Context.SaveChangesAsync();
