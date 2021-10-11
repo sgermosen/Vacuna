@@ -52,8 +52,9 @@ namespace VacunaAPI.Controllers
                 return BadRequest();
 
             var user = await GetConectedUser();
-            bool canCheckIt = false;
-            canCheckIt = await UserManager.IsInRoleAsync(user, "Admin");
+            //TODO: Change this to false
+            bool canCheckIt = true;// false;
+          //  canCheckIt = await UserManager.IsInRoleAsync(user, "Admin");
 
             if (!canCheckIt)
                 return Unauthorized();
@@ -72,11 +73,13 @@ namespace VacunaAPI.Controllers
                 return BadRequest();
 
             var user = await GetConectedUser();
-            bool canCheckIt = false;
+           
+            //TODO: Change this to false
+            bool canCheckIt = true;// false;
             if (userId == user.Id)
                 canCheckIt = true;
-            else
-                canCheckIt = await UserManager.IsInRoleAsync(user, "Admin");
+            //else
+            //    canCheckIt = await UserManager.IsInRoleAsync(user, "Admin");
 
             if (!canCheckIt)
                 return Unauthorized();
