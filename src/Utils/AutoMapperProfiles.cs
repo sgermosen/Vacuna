@@ -22,7 +22,7 @@ namespace VacunaAPI.Utils
                 .ForMember(x => x.CardPicture,
                                 options => options.Ignore());//  we ignore one or various properties than we want to treat as a diferent way  
 
-            CreateMap<IdentityUser, UserDTO>();
+            CreateMap<ApplicationUser, UserDTO>();
               
             //Map Details from file of another part of class
             //CreateMap<DomainObjectCreationDTO, DomainObject>()
