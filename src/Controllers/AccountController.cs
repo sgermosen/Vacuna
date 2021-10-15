@@ -28,15 +28,97 @@ namespace VacunaAPI.Controllers
         private readonly ApplicationDbContext context;
         private readonly IConfiguration configuration;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly IMailHelper mailHelper;
 
         public AccountController(UserManager<ApplicationUser> userManager,
-      IMapper mapper, ApplicationDbContext context, IConfiguration configuration, SignInManager<ApplicationUser> signInManager)
+      IMapper mapper, ApplicationDbContext context, IConfiguration configuration,
+      SignInManager<ApplicationUser> signInManager, IMailHelper mailHelper)
         {
             this.userManager = userManager;
             this.mapper = mapper;
             this.context = context;
             this.configuration = configuration;
             this.signInManager = signInManager;
+            this.mailHelper = mailHelper;
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("changePassword")]
+
+        public async Task<ActionResult> ChangePassword(ChangePasswordDTO model)
+        {
+            var user = await GetConectedUser();
+            if (user != null)
+            {
+                var result = await userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                if (result.Succeeded)
+                    return Ok();
+                else
+                    return BadRequest(result.Errors.FirstOrDefault().Description);
+            }
+            return BadRequest("Usuario no encontrado.");
+        }
+
+        [HttpPost("confirmEmail")]
+        public async Task<ActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            {
+                return NotFound();
+            }
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var result = await userManager.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("recoverPassword")]
+        public async Task<ActionResult> RecoverPassword(RecoverPasswordDTO model)
+        {
+
+            var user = await context.Users.Where(p => p.Email == model.Email).FirstOrDefaultAsync();
+            if (user == null)
+                return BadRequest("El correo ingresado no corresponde a ningún usuario.");
+
+            string myToken = await userManager.GeneratePasswordResetTokenAsync(user);
+            string link = Url.Action(
+                "ResetPassword",
+                "SgViews",
+                new { token = myToken }, protocol: HttpContext.Request.Scheme);
+
+            mailHelper.SendMail(model.Email, "Inoculapp - Reseteo de contraseña", $"<h1>Inoculapp- Reseteo de contraseña</h1>" +
+                $"Para establecer una nueva contraseña haga clic en el siguiente enlace:</br></br>" +
+                $"<a href = \"{link}\">Cambio de Contraseña</a>");
+
+            return Ok("Las instrucciones para el cambio de contraseña han sido enviadas a su email.");
+
+        }
+
+        [HttpPost("resetPassword")]
+        public async Task<ActionResult> ResetPassword(ResetPasswordDTO model)
+        {
+            var user = await GetConectedUser();
+            if (user != null)
+            {
+                var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
+                if (result.Succeeded)
+                {
+                    return Ok("Contaseña cambiada.");
+                }
+                return BadRequest("Error cambiando la contraseña.");
+            }
+
+            return BadRequest("Usuario no encontrado.");
         }
 
         [HttpPost("createFromMinistry")]
@@ -164,7 +246,11 @@ namespace VacunaAPI.Controllers
             return NoContent();
         }
 
-
-
+        private async Task<ApplicationUser> GetConectedUser()
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "email")?.Value;
+            var user = await userManager.FindByEmailAsync(email);
+            return user;
+        }
     }
 }
