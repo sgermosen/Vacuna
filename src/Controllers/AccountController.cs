@@ -15,6 +15,8 @@ using System.Text;
 using System.Threading.Tasks;
 using VacunaAPI.DTOs;
 using VacunaAPI.Entities;
+using VacunaAPI.Models;
+using VacunaAPI.Services;
 using VacunaAPI.Utils;
 
 namespace VacunaAPI.Controllers
@@ -29,11 +31,13 @@ namespace VacunaAPI.Controllers
         private readonly IConfiguration configuration;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IMailHelper mailHelper;
+        private readonly IAccountService _userService;
 
         public AccountController(UserManager<ApplicationUser> userManager,
       IMapper mapper, ApplicationDbContext context, IConfiguration configuration,
-      SignInManager<ApplicationUser> signInManager, IMailHelper mailHelper)
+      SignInManager<ApplicationUser> signInManager, IMailHelper mailHelper, IAccountService userService)
         {
+            _userService = userService;
             this.userManager = userManager;
             this.mapper = mapper;
             this.context = context;
@@ -42,6 +46,120 @@ namespace VacunaAPI.Controllers
             this.mailHelper = mailHelper;
         }
 
+        // /api/auth/register
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterAsync([FromBody] RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _userService.RegisterUserAsync(model);
+
+                if (result.IsSuccess)
+                    return Ok(result); // Status Code: 200 
+
+                return BadRequest(result);
+            }
+
+            return BadRequest("Some properties are not valid"); // Status code: 400
+        }
+
+        // /api/auth/login
+        [HttpPost("loginAsync")]
+        public async Task<IActionResult> LoginAsync([FromBody] LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _userService.LoginUserAsync(model);
+
+                if (result.IsSuccess)
+                {
+                     mailHelper.SendMail(model.Email, "New login", "<h1>Hey!, new login to your account noticed</h1><p>New login to your account at " + DateTime.Now + "</p>");
+                    return Ok(result);
+                }
+
+                return BadRequest(result);
+            }
+
+            return BadRequest("Some properties are not valid");
+        }
+
+        // /api/auth/confirmemail?userid&token
+        [HttpGet("confirmEmail")]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+                return NotFound();
+
+            var result = await _userService.ConfirmEmailAsync(userId, token);
+
+            if (result.IsSuccess)
+                 return Redirect($"{configuration["AppUrl"]}/ConfirmEmail.html");
+             
+            return BadRequest(result);
+        }
+
+        // api/auth/forgetpassword
+        [HttpPost("forgetPassword")]
+        public async Task<IActionResult> ForgetPassword(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return NotFound();
+
+            var result = await _userService.ForgetPasswordAsync(email);
+
+            if (result.IsSuccess)
+                return Ok(result); // 200
+
+            return BadRequest(result); // 400
+
+            //    var user = await context.Users.Where(p => p.Email == model.Email).FirstOrDefaultAsync();
+            //    if (user == null)
+            //        return BadRequest("El correo ingresado no corresponde a ningún usuario.");
+
+            //    string myToken = await userManager.GeneratePasswordResetTokenAsync(user);
+            //    string link = Url.Action(
+            //        "ResetPassword",
+            //        "Account",
+            //        new { token = myToken }, protocol: HttpContext.Request.Scheme);
+
+            //    mailHelper.SendMail(model.Email, "Inoculapp - Reseteo de contraseña", $"<h1>Inoculapp- Reseteo de contraseña</h1>" +
+            //        $"Para establecer una nueva contraseña haga clic en el siguiente enlace:</br></br>" +
+            //        $"<a href = \"{link}\">Cambio de Contraseña</a>");
+
+            //    return Ok("Las instrucciones para el cambio de contraseña han sido enviadas a su email.");
+
+        }
+
+        // api/auth/resetpassword
+        [HttpPost("resetPassword")]
+        public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _userService.ResetPasswordAsync(model);
+
+                if (result.IsSuccess)
+                    return Ok(result);
+
+                return BadRequest(result);
+            }
+
+            return BadRequest("Some properties are not valid");
+         //   var user = await GetConectedUser();
+            //    if (user != null)
+            //    {
+            //        var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
+            //        if (result.Succeeded)
+            //        {
+            //            return Ok("Contaseña cambiada.");
+            //        }
+            //        return BadRequest("Error cambiando la contraseña.");
+            //    }
+
+            //    return BadRequest("Usuario no encontrado.");
+
+        }
+ 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("changePassword")]
 
@@ -57,70 +175,8 @@ namespace VacunaAPI.Controllers
                     return BadRequest(result.Errors.FirstOrDefault().Description);
             }
             return BadRequest("Usuario no encontrado.");
-        }
-
-        [HttpPost("confirmEmail")]
-        public async Task<ActionResult> ConfirmEmail(string userId, string token)
-        {
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
-            {
-                return NotFound();
-            }
-
-            var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            var result = await userManager.ConfirmEmailAsync(user, token);
-            if (!result.Succeeded)
-            {
-                return NotFound();
-            }
-
-            return Ok();
-        }
-
-        [HttpPost("recoverPassword")]
-        public async Task<ActionResult> RecoverPassword(RecoverPasswordDTO model)
-        {
-
-            var user = await context.Users.Where(p => p.Email == model.Email).FirstOrDefaultAsync();
-            if (user == null)
-                return BadRequest("El correo ingresado no corresponde a ningún usuario.");
-
-            string myToken = await userManager.GeneratePasswordResetTokenAsync(user);
-            string link = Url.Action(
-                "ResetPassword",
-                "SgViews",
-                new { token = myToken }, protocol: HttpContext.Request.Scheme);
-
-            mailHelper.SendMail(model.Email, "Inoculapp - Reseteo de contraseña", $"<h1>Inoculapp- Reseteo de contraseña</h1>" +
-                $"Para establecer una nueva contraseña haga clic en el siguiente enlace:</br></br>" +
-                $"<a href = \"{link}\">Cambio de Contraseña</a>");
-
-            return Ok("Las instrucciones para el cambio de contraseña han sido enviadas a su email.");
-
-        }
-
-        [HttpPost("resetPassword")]
-        public async Task<ActionResult> ResetPassword(ResetPasswordDTO model)
-        {
-            var user = await GetConectedUser();
-            if (user != null)
-            {
-                var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
-                if (result.Succeeded)
-                {
-                    return Ok("Contaseña cambiada.");
-                }
-                return BadRequest("Error cambiando la contraseña.");
-            }
-
-            return BadRequest("Usuario no encontrado.");
-        }
-
+        } 
+       
         [HttpPost("createFromMinistry")]
         public async Task<ActionResult<AuthenticationResponse>> CreateFromMinistry([FromBody] UserCreationFromMinistryDTO model)
         {

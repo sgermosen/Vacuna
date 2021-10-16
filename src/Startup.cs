@@ -17,6 +17,7 @@ using System.Text;
 using VacunaAPI.Behaviors;
 using VacunaAPI.Entities;
 using VacunaAPI.Filters;
+using VacunaAPI.Services;
 using VacunaAPI.Utils;
 
 namespace VacunaAPI
@@ -46,14 +47,15 @@ namespace VacunaAPI
             services.AddSingleton<GeometryFactory>(NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326)); //Este es el valor usado para hacer mediciones en el planeta tierra, cuando se hagan sistemas para marte deben tener esto en cuenta
 
             services.AddTransient<IStorageSaver, AzureStorageSaver>();
-                   services.AddScoped<IMailHelper, MailHelper>();
+            services.AddScoped<IMailHelper, MailHelper>();
+            services.AddScoped<IAccountService, AccountService>();
+
             services.AddHttpContextAccessor();
 
             services.AddDbContext<ApplicationDbContext>(options =>
                      options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"),
                              sqlServer => sqlServer.UseNetTopologySuite()));
-
-
+             
             services.AddIdentity<ApplicationUser, IdentityRole>(cfg =>
             {
                 //  cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
@@ -69,15 +71,23 @@ namespace VacunaAPI
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+          
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            services.AddAuthentication(auth =>
+            {
+                auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                    .AddJwtBearer(options =>
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
+                    ValidateIssuer = false, //true, it need to be true
+                    ValidateAudience = false, //true, it need to be true
+                    ValidateLifetime = true, //this need to be deleted
                     ValidateIssuerSigningKey = true,
+                    //ValidAudience = Configuration["AuthSettings:Audience"], // those 3 need to be uncomment
+                    //ValidIssuer = Configuration["AuthSettings:Issuer"],
+                    //RequireExpirationTime = true, 
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(Configuration["keyjwt"])),
                     ClockSkew = TimeSpan.Zero
@@ -102,6 +112,7 @@ namespace VacunaAPI
                     options.Filters.Add(typeof(BadRequestParser));//Para que cada badrequest sea interceptado y en lugar de devolver el badrequest simple, devuelva un listado de string de los errores que sea mas facil de manipular en el que va a consumir esa app
                 }
                 ).ConfigureApiBehaviorOptions(BehaviorBadRequests.Parse); //Esto es para que se sobreescriba el badrequest que viene desde los helpers internos del framework como ApiController
+            services.AddRazorPages();
 
             services.AddCors(options =>
               {
@@ -125,12 +136,15 @@ namespace VacunaAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+           // context.Database.Migrate();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "VacunaAPI v1"));
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "VacunaAPI v1"));
 
             app.UseHttpsRedirection();
 
@@ -139,7 +153,19 @@ namespace VacunaAPI
             app.UseRouting();
 
             app.UseCors();
+            // global cors policy
+            //app.UseCors(x => x
+            //   .SetIsOriginAllowed(origin => true)
+            //   .AllowAnyMethod()
+            //   .AllowAnyHeader()
+            //   .AllowCredentials());
             //   app.UseResponseCaching();
+
+            // global error handler
+          //  app.UseMiddleware<ErrorHandlerMiddleware>();
+
+            // custom jwt auth middleware
+          //  app.UseMiddleware<JwtMiddleware>();
 
             app.UseAuthentication(); //antes de autorizarte debo autenticarte
 
@@ -147,6 +173,7 @@ namespace VacunaAPI
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapRazorPages();
                 endpoints.MapControllers();
             });
         }
