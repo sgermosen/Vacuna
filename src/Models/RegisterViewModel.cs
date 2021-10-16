@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace VacunaAPI.Models
 {
@@ -30,6 +31,9 @@ namespace VacunaAPI.Models
         public string Nationality { get; set; }
 
         public DateTime BornDate { get; set; }
+
+        public IFormFile Dni { get; set; }
+
 
     }
 }

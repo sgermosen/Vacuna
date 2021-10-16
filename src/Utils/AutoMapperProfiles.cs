@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using NetTopologySuite.Geometries;
 using VacunaAPI.DTOs;
 using VacunaAPI.Entities;
@@ -12,18 +11,19 @@ namespace VacunaAPI.Utils
         {
             CreateMap<Immunization, ImmunizationDTO>()
                 .ForMember(x => x.LaboratoryName, x => x.MapFrom(d => d.Laboratory.Name))
-                .ForMember(x => x.VaccineName, x => x.MapFrom(d => d.Vaccine.Name))
-                ;
+                .ForMember(x => x.VaccineName, x => x.MapFrom(d => d.Vaccine.Name));
 
             CreateMap<ImmunizationDTO, Immunization>();
-          //  CreateMap<Immunization, ImmunizationDTO>().ReverseMap();
 
-            CreateMap<ImmunizationCreationDTO, Immunization>()
-                .ForMember(x => x.CardPicture,
-                                options => options.Ignore());//  we ignore one or various properties than we want to treat as a diferent way  
+            CreateMap<DniOrCardDTO, Image>().ReverseMap();
+            //  CreateMap<Immunization, ImmunizationDTO>().ReverseMap();
+
+            CreateMap<ImmunizationCreationDTO, Immunization>();
+            //.ForMember(x => x.CardPicture,
+            //                options => options.Ignore());//  we ignore one or various properties than we want to treat as a diferent way  
 
             CreateMap<ApplicationUser, UserDTO>();
-              
+
             //Map Details from file of another part of class
             //CreateMap<DomainObjectCreationDTO, DomainObject>()
             // .ForMember(x => x.Photo,

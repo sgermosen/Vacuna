@@ -26,7 +26,6 @@ namespace VacunaAPI.Entities
 
         public DateTime Date { get; set; }
         public string Barcode { get; set; }
-        public string CardPicture { get; set; }
 
         public string UserId { get; set; }
 

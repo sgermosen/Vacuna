@@ -46,21 +46,19 @@ namespace VacunaAPI.Controllers
             this.mailHelper = mailHelper;
         }
 
+
         // /api/auth/register
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var result = await _userService.RegisterUserAsync(model);
+            if (!ModelState.IsValid) return BadRequest("Some properties are not valid"); // Status code: 400
+            var result = await _userService.RegisterUserAsync(model);
 
-                if (result.IsSuccess)
-                    return Ok(result); // Status Code: 200 
+            if (result.IsSuccess)
+                return Ok(result); // Status Code: 200 
 
-                return BadRequest(result);
-            }
+            return BadRequest(result);
 
-            return BadRequest("Some properties are not valid"); // Status code: 400
         }
 
         // /api/auth/login
@@ -97,15 +95,14 @@ namespace VacunaAPI.Controllers
              
             return BadRequest(result);
         }
-
-        // api/auth/forgetpassword
+        
         [HttpPost("forgetPassword")]
-        public async Task<IActionResult> ForgetPassword(string email)
+        public async Task<IActionResult> ForgetPassword( ForgotPasswordRequest model)
         {
-            if (string.IsNullOrEmpty(email))
+            if (string.IsNullOrEmpty(model.Email))
                 return NotFound();
 
-            var result = await _userService.ForgetPasswordAsync(email);
+            var result = await _userService.ForgetPasswordAsync(model.Email);
 
             if (result.IsSuccess)
                 return Ok(result); // 200
@@ -162,7 +159,6 @@ namespace VacunaAPI.Controllers
  
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("changePassword")]
-
         public async Task<ActionResult> ChangePassword(ChangePasswordDTO model)
         {
             var user = await GetConectedUser();

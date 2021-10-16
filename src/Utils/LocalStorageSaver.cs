@@ -40,6 +40,26 @@ namespace VacunaAPI.Utils
             return routeForDb;
         }
 
+        public Task<Guid> UploadBlobAsync(IFormFile file, string containerName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Guid> UploadBlobAsync(byte[] file, string containerName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Guid> UploadBlobAsync(string image, string containerName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteBlobAsync(Guid id, string containerName)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task DeleteFile(string route, string container)
         {
             if (string.IsNullOrEmpty(route))

@@ -20,7 +20,9 @@ namespace VacunaAPI.Controllers
     {
         private readonly string container = "ImmunizationCards";
 
-        public ImmunizationsController(UserManager<ApplicationUser> userManager, IMapper mapper, IStorageSaver storageSaver, ApplicationDbContext context) : base(userManager, mapper, storageSaver, context)
+        public ImmunizationsController(UserManager<ApplicationUser> userManager, IMapper mapper,
+            IStorageSaver storageSaver, ApplicationDbContext context) :
+            base(userManager, mapper, storageSaver, context)
         {
         }
 
@@ -54,7 +56,7 @@ namespace VacunaAPI.Controllers
             var user = await GetConectedUser();
             //TODO: Change this to false
             bool canCheckIt = true;// false;
-          //  canCheckIt = await UserManager.IsInRoleAsync(user, "Admin");
+                                   //  canCheckIt = await UserManager.IsInRoleAsync(user, "Admin");
 
             if (!canCheckIt)
                 return Unauthorized();
@@ -73,7 +75,7 @@ namespace VacunaAPI.Controllers
                 return BadRequest();
 
             var user = await GetConectedUser();
-           
+
             //TODO: Change this to false
             bool canCheckIt = true;// false;
             if (userId == user.Id)
@@ -93,7 +95,7 @@ namespace VacunaAPI.Controllers
             var userDto = Mapper.Map<UserDTO>(user);
 
             var fullimmunization = new FullImmunizationDTO();
-            fullimmunization.Immunizations = immunizationsDto; 
+            fullimmunization.Immunizations = immunizationsDto;
             fullimmunization.Person = userDto;
 
             return fullimmunization;
@@ -160,14 +162,19 @@ namespace VacunaAPI.Controllers
         {
             var user = await GetConectedUser();
 
-            var inmunization = Mapper.Map<Immunization>(model);
+            var immunization = Mapper.Map<Immunization>(model);
             if (model.Photo != null)
-                inmunization.CardPicture = await StorageSaver.SaveFile(container, model.Photo);
-            inmunization.UserId = user.Id;
+            {
+                var cardPicture = new Image { UserId = user.Id, TypeId = 2 };
+                cardPicture.ImageUrl = await StorageSaver.SaveFile(container, model.Photo);
+                Context.Images.Add(cardPicture);
+                await Context.SaveChangesAsync();
+            }
+            immunization.UserId = user.Id;
 
             //TODO: Here we have to make validation of the center if exist or something
 
-            Context.Add(inmunization);
+            Context.Add(immunization);
             await Context.SaveChangesAsync();
 
             return NoContent();
@@ -175,7 +182,7 @@ namespace VacunaAPI.Controllers
 
         private async Task<ApplicationUser> GetConectedUser()
         {
-            var email = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "email").Value;
+            var email = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "email")?.Value;
             var user = await UserManager.FindByEmailAsync(email);
             return user;
         }

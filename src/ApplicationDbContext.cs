@@ -29,6 +29,9 @@ namespace VacunaAPI
         public DbSet<Laboratory> Laboratories { get; set; }
         public DbSet<Vaccine> Vaccines { get; set; }
 
+        public DbSet<Image> Images { get; set; }
+        public DbSet<ImageType> ImageTypes { get; set; }
+
 
     }
 }

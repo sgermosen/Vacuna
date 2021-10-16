@@ -33,6 +33,7 @@ namespace VacunaAPI.Services
 
     public class AccountService : IAccountService
     {
+        private readonly IStorageSaver _storageSaver;
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly AppSettings _appSettings;
@@ -43,8 +44,9 @@ namespace VacunaAPI.Services
             ApplicationDbContext context,
             IMapper mapper,
             IOptions<AppSettings> appSettings, IConfiguration configuration,
-            IMailHelper emailService, UserManager<ApplicationUser> userManager)
+            IMailHelper emailService, UserManager<ApplicationUser> userManager, IStorageSaver storageSaver)
         {
+            _storageSaver = storageSaver;
             _configuration = configuration;
             _context = context;
             _mapper = mapper;
@@ -80,6 +82,13 @@ namespace VacunaAPI.Services
 
             if (result.Succeeded)
             {
+                if (model.Dni != null)
+                {
+                    var cardPicture = new Image { UserId = identityUser.Id, TypeId = 1 };
+                    cardPicture.ImageUrl = await _storageSaver.SaveFile("PersonalIdentification", model.Dni);
+                    _context.Images.Add(cardPicture);
+                    await _context.SaveChangesAsync();
+                }
                 var confirmEmailToken = await _userManger.GenerateEmailConfirmationTokenAsync(identityUser);
 
                 var encodedEmailToken = Encoding.UTF8.GetBytes(confirmEmailToken);

@@ -18,9 +18,7 @@ namespace VacunaAPI.Entities
         public string Nationality { get; set; }
 
         public DateTime BornDate { get; set; }
-
-        public string IdentificationPicture { get; set; }
-
+         
         public bool IsFromMinistry { get; set; }
         public int? VacunationCenterId { get; set; }
         public VacunationCenter VacunationCenter { get; set; }//Only is filled for user than are created from ministry
