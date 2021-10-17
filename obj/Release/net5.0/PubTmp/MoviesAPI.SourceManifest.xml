@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<sitemanifest>
+  <IisApp path="\\Mac\Home\Documents\_Dev\_ReactLearn\MoviesAPI\obj\Release\net5.0\PubTmp\Out\" />
+  <dbfullsql path="\\Mac\Home\Documents\_Dev\_ReactLearn\MoviesAPI\obj\Release\net5.0\PubTmp\EFSQLScripts\MoviesAPI.ApplicationDbContext.sql" />
+</sitemanifest>
