@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<parameters>
-  <parameter name="IIS Web Application Name" description="" value="MoviesAPIsG" tags="IisApp">
-    <parameterEntry kind="ProviderPath" scope="IisApp" match="^\\\\Mac\\Home\\Documents\\_Dev\\_ReactLearn\\MoviesAPI\\obj\\Release\\net5\.0\\PubTmp\\Out\\$" />
-  </parameter>
-  <parameter name="MoviesAPI.ApplicationDbContext" description="" value="Data Source=tcp:moviesapidbserversg.database.windows.net,1433;Initial Catalog=MoviesAPI_db;User Id=sgrysoft@moviesapidbserversg;Password=StarlinG106*" tags="dbfullsql">
-    <parameterEntry kind="ProviderPath" scope="dbfullsql" match="^\\\\Mac\\Home\\Documents\\_Dev\\_ReactLearn\\MoviesAPI\\obj\\Release\\net5\.0\\PubTmp\\EFSQLScripts\\MoviesAPI\.ApplicationDbContext\.sql$" />
-  </parameter>
-</parameters>
