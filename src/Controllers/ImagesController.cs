@@ -60,7 +60,7 @@ namespace VacunaAPI.Controllers
             Context.Images.Add(cardPicture);
             await Context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(cardPicture);
         }
 
         private async Task<ApplicationUser> GetConectedUser()
