@@ -102,7 +102,7 @@ namespace VacunaAPI.Controllers
         }
 
         [HttpGet("getIfUserIsImmunizedWith")]
-        public async Task<ActionResult<List<ImmunizationDTO>>> GetIfUserIsImmunizedWith(string userId, [FromQuery] int[] vaccinesIds)
+        public async Task<ActionResult<IsVaccinatedWithDTO>> GetIfUserIsImmunizedWith(string userId, [FromQuery] int[] vaccinesIds)
         {
             if (!(vaccinesIds.Length > 0))
                 return BadRequest();
@@ -113,6 +113,7 @@ namespace VacunaAPI.Controllers
             //TODO: Change this to false
             bool canCheckIt = true;// false;
             bool isImmunized = false;
+            bool isValidated = false;
 
             //TODO: Enabled This
             //  canCheckIt = await UserManager.IsInRoleAsync(user, "Admin");
@@ -120,17 +121,33 @@ namespace VacunaAPI.Controllers
             if (!canCheckIt)
                 return Unauthorized();
 
-            var inmunizations = await Context.Immunizations
+            var immunizations = await Context.Immunizations
                 .Include(p => p.Vaccine)
                 .Include(p => p.Laboratory)
                 .Where(p => p.UserId == userId).ToListAsync();
 
             foreach (var vaccineId in vaccinesIds)
             {
-                isImmunized = inmunizations.Any(p => p.VaccineId == vaccineId);
+                var immunization = immunizations.FirstOrDefault(p => p.VaccineId == vaccineId);
+                if (immunization == null)
+                {
+                    isValidated = false;
+                    isImmunized = false;
+                    break;
+                }
+                else
+                {
+                    isValidated = immunization.WasValidated;
+                    isImmunized = true;
+                }
             }
+            var dtos =  Mapper.Map<List<ImmunizationDTO>>(immunizations);
+            var isVaccinated = new IsVaccinatedWithDTO
+            {
+                IsImmunized = isImmunized, IsValidated=isValidated, Immunizations = dtos
+            };
 
-            return Ok(isImmunized);
+            return Ok(isVaccinated);
         }
 
         [HttpGet("getById")]
@@ -139,21 +156,21 @@ namespace VacunaAPI.Controllers
             var user = await GetConectedUser();
             bool canCheckIt = false;
 
-            var inmunization = await Context.Immunizations
+            var immunization = await Context.Immunizations
                 .Include(p => p.Vaccine)
                 .Include(p => p.Laboratory)
                 .Where(p => p.Id == id).FirstOrDefaultAsync();
 
-            if (inmunization != null)
+            if (immunization != null)
             {
-                if (inmunization.UserId != user.Id)
+                if (immunization.UserId != user.Id)
                 {
                     canCheckIt = await UserManager.IsInRoleAsync(user, "Admin");
                     if (canCheckIt == false)
                         return Unauthorized();
                 }
             }
-            return Mapper.Map<ImmunizationDTO>(inmunization);
+            return Mapper.Map<ImmunizationDTO>(immunization);
         }
 
 

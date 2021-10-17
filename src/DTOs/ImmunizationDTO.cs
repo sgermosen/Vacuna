@@ -29,5 +29,8 @@ namespace VacunaAPI.DTOs
 
         public string Photo { get; set; }
 
+        public bool WasValidated { get; set; }
+
+
     }
 }
