@@ -301,6 +301,8 @@ namespace VacunaAPI.Controllers
         private async Task<ApplicationUser> GetConectedUser()
         {
             var email = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "email")?.Value;
+            if (string.IsNullOrEmpty(email))
+                return new ApplicationUser();
             var user = await userManager.FindByEmailAsync(email);
             return user;
         }

@@ -16,9 +16,9 @@ namespace VacunaAPI.Entities
 
         public string Container => TypeId switch
         {
-            1 => "PersonalIdentification",
-            2 => "ImmunizationCards",
-            _ => "ProfilePicture"
+            1 => "personalidentification",
+            2 => "immunizationcards",
+            _ => "profilepicture"
         };
         public string ImageFullPath => ImageId == Guid.Empty
             ? $"{StaticValues.AppUrl}/images/unnamed.png"
