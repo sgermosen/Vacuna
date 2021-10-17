@@ -176,3 +176,4 @@
 \\Mac\Home\Documents\_Dev\Vacuna\src\obj\Release\net5.0\ref\VacunaAPI.dll
 \\Mac\Home\Documents\_Dev\Vacuna\src\obj\Release\net5.0\VacunaAPI.pdb
 \\Mac\Home\Documents\_Dev\Vacuna\src\obj\Release\net5.0\VacunaAPI.genruntimeconfig.cache
+\\Mac\Home\Documents\_Dev\Vacuna\src\bin\Release\net5.0\appsettings.Development.json
