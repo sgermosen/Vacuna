@@ -124,28 +124,36 @@ namespace VacunaAPI.Controllers
             var immunizations = await Context.Immunizations
                 .Include(p => p.Vaccine)
                 .Include(p => p.Laboratory)
+                .Include(p=>p.User)
                 .Where(p => p.UserId == userId).ToListAsync();
 
-            foreach (var vaccineId in vaccinesIds)
+            var isVaccinated = new IsVaccinatedWithDTO();
+            if (immunizations != null && immunizations.Any())
             {
-                var immunization = immunizations.FirstOrDefault(p => p.VaccineId == vaccineId);
-                if (immunization == null)
+                foreach (var vaccineId in vaccinesIds)
                 {
-                    isValidated = false;
-                    isImmunized = false;
-                    break;
+                    var immunization = immunizations.FirstOrDefault(p => p.VaccineId == vaccineId);
+                    if (immunization == null)
+                    {
+                        isValidated = false;
+                        isImmunized = false;
+                        break;
+                    }
+                    else
+                    {
+                        isValidated = immunization.WasValidated;
+                        isImmunized = true;
+                    }
                 }
-                else
-                {
-                    isValidated = immunization.WasValidated;
-                    isImmunized = true;
-                }
+
+                var dtos = Mapper.Map<List<ImmunizationDTO>>(immunizations);
+                 
+                isVaccinated.IsImmunized = isImmunized; isVaccinated.IsValidated = isValidated;
+                isVaccinated.Immunizations = dtos;
+               var immunizedUser = immunizations.FirstOrDefault()?.User;
+               if (immunizedUser != null) isVaccinated.Identification = immunizedUser.Identification;
             }
-            var dtos =  Mapper.Map<List<ImmunizationDTO>>(immunizations);
-            var isVaccinated = new IsVaccinatedWithDTO
-            {
-                IsImmunized = isImmunized, IsValidated=isValidated, Immunizations = dtos
-            };
+
 
             return Ok(isVaccinated);
         }
